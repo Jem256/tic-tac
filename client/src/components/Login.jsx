@@ -1,28 +1,45 @@
 import { useState } from 'react';
+import Axios from 'axios';
+import Cookies from 'universal-cookie';
 
-function Login() {
-    const [user, setUser] = useState(null);
+function Login({ setIsAuth }) {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
 
-    const login = () => {};
+    const cookies = new Cookies();
+    const login = () => {
+        Axios.post('http://localhost:3001/login', {
+            username,
+            password,
+        }).then((res) => {
+            const { firstName, lastName, username, token, userId } = res.data;
+            cookies.set('token', token);
+            cookies.set('userId', userId);
+            cookies.set('username', username);
+            cookies.set('firstName', firstName);
+            cookies.set('lastName', lastName);
+            setIsAuth(true);
+        });
+    };
     return (
-        <form className='login'>
-            <label>Login</label>
+        <div className='login'>
+            <label> Login</label>
+
             <input
-                type='text'
                 placeholder='Username'
-                onChange={(e) => {
-                    setUser({ ...user, username: e.target.value });
+                onChange={(event) => {
+                    setUsername(event.target.value);
                 }}
             />
             <input
-                type='password'
                 placeholder='Password'
-                onChange={(e) => {
-                    setUser({ ...user, password: e.target.value });
+                type='password'
+                onChange={(event) => {
+                    setPassword(event.target.value);
                 }}
             />
-            <button onClick={login}>SignUp</button>
-        </form>
+            <button onClick={login}> Login</button>
+        </div>
     );
 }
 
